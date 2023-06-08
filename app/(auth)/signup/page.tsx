@@ -8,8 +8,10 @@ import React from "react";
 import { SignupSchema } from "@/lib/FormikValidate";
 import { signUpWithEmail } from "@/lib/Firebase";
 import { User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
-function signup() {
+function Signup() {
+  const router = useRouter();
   return (
     <div className="mt-[48px]  background-gradient min-h-screen flex justify-center items-center p-28">
       <Formik
@@ -32,7 +34,7 @@ function signup() {
                 console.log(error);
               } else if (user) {
                 // navigate to home
-                console.log(user);
+                router.replace("/");
               }
             }
           );
@@ -112,4 +114,4 @@ function signup() {
   );
 }
 
-export default signup;
+export default Signup;

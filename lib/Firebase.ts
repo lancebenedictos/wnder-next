@@ -53,10 +53,18 @@ function signOutUser() {
     .catch((err) => {});
 }
 
-function signInWithEmail(email: string, password: string) {
+function signInWithEmail(
+  email: string,
+  password: string,
+  cb: (isSuccess: boolean) => void
+) {
   signInWithEmailAndPassword(auth, email, password)
-    .then((res) => {})
-    .catch((err) => {});
+    .then((res) => {
+      cb(true);
+    })
+    .catch((err) => {
+      cb(false);
+    });
 }
 
 export { auth, app, signUpWithEmail, signInWithEmail, signOutUser };

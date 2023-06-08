@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { LoginSchema } from "@/lib/FormikValidate";
 import { signInWithEmail } from "@/lib/Firebase";
+import { useRouter } from "next/navigation";
 
 function Login() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   return (
     <div className="mt-[48px]  background-gradient min-h-screen flex justify-center items-center p-28">
       <Formik
@@ -22,7 +25,13 @@ function Login() {
         onSubmit={(values) => {
           // same shape as initial values
           const { email, password } = values;
-          signInWithEmail(email, password);
+          signInWithEmail(email, password, (success) => {
+            if (success) {
+              router.replace("/");
+            } else {
+              setError("Email or password is incorrect.");
+            }
+          });
         }}
       >
         {({ errors, touched }) => (
@@ -56,6 +65,7 @@ function Login() {
               <p className=" text-rose-400">{errors.password}</p>
             ) : null}
 
+            {error ? <p>{error}</p> : null}
             <Link href="/signup" className=" text-gray-700">
               Don&#39;t have an account? Sign up
             </Link>
