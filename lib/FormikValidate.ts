@@ -41,4 +41,8 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
-export { SignupSchema, LoginSchema };
+const PlanSchema = Yup.object().shape({
+  name: Yup.string().required("Required"),
+});
+
+export { SignupSchema, LoginSchema, PlanSchema };

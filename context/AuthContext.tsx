@@ -4,7 +4,11 @@ import { onAuthStateChanged, getAuth, User } from "firebase/auth";
 import { app } from "../lib/Firebase";
 const auth = getAuth(app);
 
-export const AuthContext = React.createContext({});
+type contextType = {
+  user: User | null;
+};
+
+export const AuthContext = React.createContext<contextType>({ user: null });
 
 export const useAuthContext = () => React.useContext(AuthContext);
 

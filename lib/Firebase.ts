@@ -1,5 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { getApp, getApps, initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
+
 import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
@@ -7,6 +16,7 @@ import {
   User,
   signOut,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import DevLog from "@/utils/DevelopmentLog";
 
@@ -24,17 +34,20 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 // const analytics = getAnalytics(app);
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 function signUpWithEmail(
   email: string,
   password: string,
+  username: string,
   cb: (user: User | null, error: Error | null) => void
 ) {
   createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       // Signed in
       const user = userCredential.user;
-
+      const userPath = `users/${user.uid}`;
+      await updateDocument({ username }, userPath);
       cb(user, null);
       // ...
     })
@@ -67,4 +80,64 @@ function signInWithEmail(
     });
 }
 
-export { auth, app, signUpWithEmail, signInWithEmail, signOutUser };
+/**
+ * @param document - any type of data
+ * @param path - The path where the data is stored in firestore
+ * @returns Reference ID for the uploaded document
+ */
+async function createDocument(data: any, path: string) {
+  try {
+    const ref = collection(db, path);
+    const docRef = await addDoc(ref, data);
+
+    return docRef.id;
+  } catch (error) {
+    DevLog(error);
+
+    return null;
+  }
+}
+
+async function updateDocument(data: any, path: string) {
+  try {
+    const ref = doc(db, path);
+    await setDoc(ref, data);
+
+    return;
+  } catch (error) {
+    DevLog(error);
+    return null;
+  }
+}
+
+async function getDocument(path: string) {
+  try {
+    const ref = doc(db, path);
+    const docSnap = await getDoc(ref);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    DevLog(error);
+  }
+}
+
+/**
+ * @returns DocumentReference
+ * */
+function getUserRef(id: string) {
+  const ref = doc(db, `/users/${id}`);
+  return ref;
+}
+export {
+  auth,
+  app,
+  signUpWithEmail,
+  signInWithEmail,
+  signOutUser,
+  createDocument,
+  getUserRef,
+  getDocument,
+};
